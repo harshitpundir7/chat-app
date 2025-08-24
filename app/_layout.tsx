@@ -1,20 +1,16 @@
-import { Stack } from "expo-router";
-import { StyleSheet } from "react-native";
-import "./global.css";
 
-export default function RootLayout() {
+import { Stack } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
+import React from 'react'
+
+const RootLayout = () => {
   return (
-    <Stack >
-      {/* <StatusBar backgroundColor="black" /> */}
-      <Stack.Screen  name="login/login" options={{title : "Login"}} />
-      <Stack.Screen name="signup/signup" options={{title: "Signup"}} />
-    </Stack>
-  );
+    <>
+    <StatusBar style='inverted' />
+  <Stack screenOptions={{headerShown:false}} 
+  />
+    </>
+  )
 }
 
-const styles =StyleSheet.create({
-statusBar: {
-  color: "White",
-  backgroundColor: "black"
-}
-})
+export default RootLayout

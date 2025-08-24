@@ -1,6 +1,9 @@
 //toast implementation
+import { authApi } from "@/utils/constants";
+import toastConfig from "@/utils/toastConfig";
 import { loginValidation } from "@/utils/zod";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from "expo-router";
+import * as secureStorage from "expo-secure-store";
 import { AtSign, Lock, MoveRight } from "lucide-react-native";
 import React, { useRef, useState } from "react";
 import {
@@ -18,11 +21,22 @@ export default function LoginScreen() {
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
   const passwordInputField = useRef<TextInput>(null);
+  const [loading,setLoading] = useState<boolean>(false)
+  const router = useRouter();
+
+  if(loading){
+    Toast.show({
+      type:"loading",
+      text1: "Loading..."
+    })
+  }
 
   async function Login(){
+    setLoading(true)
     const {data,error} = loginValidation.safeParse({email,password});
     if(error||!data){
-      // console.error(error);
+      console.error(error);
+      setLoading(false)
       // ToastAndroid.showWithGravity("invalid credentials",5000,ToastAndroid.TOP)
       Toast.show({
         type : "error",
@@ -31,12 +45,21 @@ export default function LoginScreen() {
       });
     }
     try{
-    const res = await fetch(`${process.env.EXPO_PUBLIC_AUTH_API_URL}/api/auth/login`,{method : "POST",headers:{"Content-Type" : "Application/json"},body : JSON.stringify(data)});
+      console.log("luulluu")
+    const res = await fetch(`${authApi}/api/auth/login`,{method : "POST",headers:{"Content-Type" : "Application/json"},body : JSON.stringify(data)});
     const resData = await res.json();
     const token = resData.cookie;
-    await AsyncStorage.setItem('authToken',token);
+    await secureStorage.setItemAsync("authToken", token);
+    Toast.show({
+      type : "success",
+      text1 : "Logged in successfull",
+    });
+    router.replace("/(home)")
+    
     } catch(err){
       console.error(err);
+    }finally{
+      setLoading(false)
     }
 
   }
@@ -45,6 +68,7 @@ export default function LoginScreen() {
       behavior={Platform.OS === "android" ? "padding" : "height"}
       style={styles.loginPage}
     >
+      <Toast config={toastConfig}/>
       <View style={styles.container}>
         <Text style={styles.textHeading}>Welcome Back!</Text>
         <Text style={styles.text}>Get started with the Chat app</Text>
@@ -78,6 +102,8 @@ export default function LoginScreen() {
             ref={passwordInputField}
             onChangeText={setPassword}
             secureTextEntry
+            returnKeyType="go"
+            onSubmitEditing={()=>Login()}
           />
           <View style={styles.iconContainer}>
             <Lock size="18" color="#7e8295" />
@@ -93,7 +119,7 @@ export default function LoginScreen() {
           <Text style={styles.footerContent}>
             Don't have an account?
           </Text>
-          <Text style={styles.footerLink}>
+          <Text style={styles.footerLink} onPress={()=>router.push("/signup/signup")}>
             {" "}Start Your Journey
           </Text>
         </View>

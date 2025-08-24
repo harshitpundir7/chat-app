@@ -1,5 +1,6 @@
-//add ref for email and password to show next button keyboard
-//complete login and signup functionality
+//toast implementation
+import { loginValidation } from "@/utils/zod";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AtSign, Lock, MoveRight } from "lucide-react-native";
 import React, { useRef, useState } from "react";
 import {
@@ -9,16 +10,34 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  View,
+  View
 } from "react-native";
+import Toast from 'react-native-toast-message';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
   const passwordInputField = useRef<TextInput>(null);
 
-  function Login(){
-    console.log(email,password);
+  async function Login(){
+    const {data,error} = loginValidation.safeParse({email,password});
+    if(error||!data){
+      // console.error(error);
+      // ToastAndroid.showWithGravity("invalid credentials",5000,ToastAndroid.TOP)
+      Toast.show({
+        type : "error",
+        text1 : "invalid credetials",
+         text2: 'An error occurred while saving your item.',
+      });
+    }
+    try{
+    const res = await fetch(`${process.env.EXPO_PUBLIC_AUTH_API_URL}/api/auth/login`,{method : "POST",headers:{"Content-Type" : "Application/json"},body : JSON.stringify(data)});
+    const resData = await res.json();
+    const token = resData.cookie;
+    await AsyncStorage.setItem('authToken',token);
+    } catch(err){
+      console.error(err);
+    }
 
   }
   return (

@@ -48,13 +48,14 @@ export default function LoginScreen() {
       console.log("luulluu")
     const res = await fetch(`${authApi}/api/auth/login`,{method : "POST",headers:{"Content-Type" : "Application/json"},body : JSON.stringify(data)});
     const resData = await res.json();
+    console.log(resData)
     const token = resData.cookie;
     await secureStorage.setItemAsync("authToken", token);
     Toast.show({
       type : "success",
       text1 : "Logged in successfull",
     });
-    router.replace("/(home)")
+    router.replace("/(dashboard)/(tabs)/Chats/page")
     
     } catch(err){
       console.error(err);

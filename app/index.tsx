@@ -19,7 +19,7 @@ export default function Index(){
     return(
         <>
         {isLoggedIn?(
-            <Redirect href="/(home)"/>
+            <Redirect href="/(dashboard)/(tabs)/Chats/page"/>
         ):(
             <Redirect href="/(auth)/login/login"/>
         )}

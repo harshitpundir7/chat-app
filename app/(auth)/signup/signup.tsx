@@ -53,7 +53,7 @@ export default function SignupScreen() {
       const token = resData.cookie;
       console.log(resData)
      await secureStorage.setItemAsync("authToken", token)
-     router.push("/(home)")
+     router.push("/(dashboard)/(tabs)/settings/page")
     } catch (err) {
       console.error(err);
     }

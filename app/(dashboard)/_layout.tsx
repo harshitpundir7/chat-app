@@ -4,9 +4,7 @@ import { Stack } from "expo-router";
 export default function HomeLayout(){
     return(
         <AuthProvider>
-            <Stack>
-
-            </Stack>
+            <Stack screenOptions={{headerShown:false}} />
         </AuthProvider>
     )
 }
